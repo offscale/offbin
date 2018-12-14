@@ -23,11 +23,13 @@ pub fn match_runner_to_file(path: String) -> Option<Runner> {
 }
 
 pub fn get_files_in_folder(path: String) -> Vec<String> {
-    let files = fs::read_dir("String").unwrap();
+    let paths = fs::read_dir(path).unwrap();
 
     let mut file_list = Vec::new(); 
     for path in paths {
-        file_list.push(path);
+        if let Ok(path) = path {
+            file_list.push(path.path().to_string_lossy().into_owned());
+        }
         //println!("Name: {}", path.unwrap().path().display())
     }
     return file_list
