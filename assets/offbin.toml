@@ -1,0 +1,9 @@
+[[tasks]]
+name = "hello_make"
+tool = "make"
+path = ""
+
+[[tasks]]
+name = "hello_rake"
+tool = "rake"
+path = ""

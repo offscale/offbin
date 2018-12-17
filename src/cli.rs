@@ -4,9 +4,7 @@ use structopt::StructOpt;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
 pub struct Opt {
-
-  
-   /// A flag, true if used in the command line.
+    /// A flag, true if used in the command line.
     #[structopt(short = "d", long = "debug", help = "Activate debug mode")]
     debug: bool,
 
@@ -23,8 +21,7 @@ pub struct Opt {
     #[structopt(help = "Offbin config file")]
     config: Option<String>,
 
-  /// An argument of type float, with a default value.
+    /// An argument of type float, with a default value.
     #[structopt(short = "p", long = "path", help = "set folder", default_value = "/")]
     path: String,
-
 }

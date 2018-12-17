@@ -7,5 +7,4 @@ use offbin::cli::Opt;
 fn main() {
     let opt = Opt::from_args();
     println!("{:?}", opt);
-
 }

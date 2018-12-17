@@ -1,0 +1,8 @@
+task :default do
+  puts "Hello from Rake!"
+  foo.txt
+end
+
+file 'foo.txt' do
+  touch 'foo.txt'
+end
