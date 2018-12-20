@@ -1,9 +1,21 @@
-[[tasks]]
-name = "hello_make"
-tool = "make"
-path = ""
+[config]
+skip_core_tasks = true
 
-[[tasks]]
-name = "hello_rake"
-tool = "rake"
-path = ""
+[tasks.default]
+dependencies = ["hello-world-common", "hello-world"]
+
+[tasks.hello-world-common]
+script = [
+    "touch 'testfile.txt'"
+]
+
+[tasks.hello-world]
+script = [
+    "echo \"Hello World From Unknown\""
+]
+
+[tasks.hello-world.linux]
+script = [
+    "echo \"Hello World From Linux\""
+]
+

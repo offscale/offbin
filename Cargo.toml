@@ -3,9 +3,14 @@ name = "offbin"
 version = "0.1.0"
 authors = ["rishflab <rishflab@hotmail.com>"]
 edition = "2018"
+#build = "build.rs"
 
 [dependencies]
 structopt = "0.2"
 toml = "0.4"
 serde_derive = "1.0"
 serde = "1.0"
+clap = "*"
+indexmap = "1.0.2"
+rust_info = "0.2.1"
+cargo-make = { path = "../cargo-make" }

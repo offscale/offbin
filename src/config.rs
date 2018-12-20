@@ -3,22 +3,16 @@ use std::fs;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
-
+    pub name: String,
+    pub description: String,
     pub tasks: Option<Vec<Task>>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct Tool {
-    name: String,
-    path: String,
-}
-
-#[derive(Clone, Debug, Deserialize)]
 pub struct Task {
-    name: String,
-    command: String,
-
-    args: Vec<String>,
+    pub name: String,
+    pub command: String,
+    pub args: Vec<String>,
 }
 
 
@@ -32,7 +26,6 @@ impl Task {
             .output()
             .expect("failed to execute process");
 
-
         output.stdout
     }
 }
@@ -42,8 +35,6 @@ impl Config {
 
         let contents = fs::read_to_string(filename)
             .expect("Something went wrong reading the file");
-
-
 
         toml::from_str(&contents).unwrap()
 
