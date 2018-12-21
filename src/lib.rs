@@ -6,8 +6,8 @@ extern crate clap;
 extern crate rust_info;
 extern crate indexmap;
 
-
 pub mod cli;
 pub mod config;
 pub mod cargo_gen;
 pub mod codegen;
+pub mod file_packer;
