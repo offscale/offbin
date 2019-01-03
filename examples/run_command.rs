@@ -6,13 +6,11 @@ pub fn execute_task() {
         .output()
         .expect("failed to execute process");
 
-
     let hello = output.stdout;
 
     println!("{:?}", output.status);
 }
 
 fn main() {
-
     execute_task();
 }

@@ -1,4 +1,3 @@
-use std::env;
 use std::fs;
 
 #[derive(Clone, Debug, Deserialize)]
@@ -15,9 +14,7 @@ pub struct Task {
     pub args: Vec<String>,
 }
 
-
 impl Task {
-
     pub fn execute(&self) -> Vec<u8> {
         use std::process::Command;
 
@@ -32,8 +29,7 @@ impl Task {
 
 impl Config {
     pub fn load_from_file(filename: &str) -> Config {
-        let contents = fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
         toml::from_str(&contents).unwrap()
     }
@@ -45,7 +41,7 @@ impl Config {
                     task.execute();
                 }
             }
-            None => ()
+            None => (),
         }
     }
 }
@@ -72,26 +68,26 @@ mod tests {
         assert_eq!(2, decoded.tasks.unwrap().first().unwrap().args.len());
     }
 
+    #[test]
+    fn test_load_from_file() {
+        let mut path = String::new();
+        path.push_str(env!("CARGO_MANIFEST_DIR"));
+        path.push_str("/assets/offbin.toml");
 
-   #[test]
-   fn test_load_from_file() {
-
-       let mut path = String::new();
-       path.push_str(env!("CARGO_MANIFEST_DIR"));
-       path.push_str("/assets/offbin.toml");
-
-       let decoded = Config::load_from_file(&path);
-       println!("{:#?}", decoded);
-       assert_eq!(2, decoded.tasks.unwrap().len());
-   }
+        let decoded = Config::load_from_file(&path);
+        println!("{:#?}", decoded);
+        assert_eq!(2, decoded.tasks.unwrap().len());
+    }
 
     #[test]
     fn test_execute_task() {
-
         let task = Task {
             name: "hello_from_rake".to_string(),
             command: "rake".to_string(),
-            args: vec!["--rakefile".to_string(), "/Users/rishflab/offbin/assets/Rakefile".to_string()],
+            args: vec![
+                "--rakefile".to_string(),
+                "/Users/rishflab/offbin/assets/Rakefile".to_string(),
+            ],
         };
 
         let output = task.execute();
@@ -99,6 +95,5 @@ mod tests {
         println!("{:?}", output);
 
         assert_eq!(2, 2);
-
     }
 }

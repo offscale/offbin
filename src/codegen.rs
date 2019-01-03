@@ -1,41 +1,34 @@
+use crate::file_packer::FilePack;
 use cargo_make::types::Task;
 use indexmap::IndexMap;
 use std::fs::File;
 use std::io::prelude::*;
-use crate::file_packer::FilePack;
 
 pub trait FormatRust<T> {
     fn to_rust(&self) -> String;
 }
 
 impl FormatRust<Option<Vec<String>>> for Option<Vec<String>> {
-    fn to_rust (&self) -> String {
+    fn to_rust(&self) -> String {
         match self {
             Some(lines) => {
-                let mut base = 
-r#"Some(vec!["#.to_string();  
-                for line in lines {      
-                    base.push_str(&format!("{}, ", line.to_rust()));   
+                let mut base = r#"Some(vec!["#.to_string();
+                for line in lines {
+                    base.push_str(&format!("{}, ", line.to_rust()));
                 }
                 base.push_str("]),");
                 base
-            },
-            None => {
-                "None,".to_string()
             }
-        }      
+            None => "None,".to_string(),
+        }
     }
 }
 
 impl FormatRust<Option<String>> for Option<String> {
     fn to_rust(&self) -> String {
         match self {
-            Some(line) => {
-                format!("Some({}),", line.to_rust())
-            },
-            None => {
-                "None,".to_string()
-            }
+            Some(line) => format!("Some({}),", line.to_rust()),
+            None => "None,".to_string(),
         }
     }
 }
@@ -47,9 +40,8 @@ impl FormatRust<String> for String {
 }
 
 impl FormatRust<Task> for Task {
-    fn to_rust (&self) -> String {
-        let mut top = 
-    r#"Task { 
+    fn to_rust(&self) -> String {
+        let mut top = r#"Task { 
         clear: None,
         description: None,
         category: None,
@@ -66,14 +58,17 @@ impl FormatRust<Task> for Task {
         install_crate: None, 
         install_crate_args: None, 
         install_script: None, 
-        command: None, args: None,"#.to_string();
+        command: None, args: None,"#
+            .to_string();
 
         let script = r#"
-        script: $a"#.to_string();
+        script: $a"#
+            .to_string();
         let script = script.replace("$a", &self.script.to_rust());
 
         let script_runner = r#"
-        script_runner: $a"#.to_string();
+        script_runner: $a"#
+            .to_string();
         let script_runner = script_runner.replace("$a", &self.script_runner.to_rust());
 
         let bottom = r#"
@@ -85,22 +80,25 @@ impl FormatRust<Task> for Task {
         linux: None, 
         windows: None, 
         mac: None
-    }"#.to_string();
+    }"#
+        .to_string();
 
-    top.push_str(&script);
-    top.push_str(&script_runner);
-    top.push_str(&bottom);
-    top
+        top.push_str(&script);
+        top.push_str(&script_runner);
+        top.push_str(&bottom);
+        top
     }
 }
 
 impl FormatRust<IndexMap<String, Task>> for IndexMap<String, Task> {
     fn to_rust(&self) -> String {
         let mut task_str = r#"
-    let mut tasks: IndexMap<String, Task> = IndexMap::new();"#.to_string();
+    let mut tasks: IndexMap<String, Task> = IndexMap::new();"#
+            .to_string();
 
         let template = r#"
-    tasks.insert("$k".to_string(), $v);"#.to_string();
+    tasks.insert("$k".to_string(), $v);"#
+            .to_string();
         for (name, task) in self {
             println!("{:?}, {:?}", name, task);
             let replaced = template.replace("$k", &name);
@@ -112,11 +110,12 @@ impl FormatRust<IndexMap<String, Task>> for IndexMap<String, Task> {
     }
 }
 
-fn run_all_to_code(tasks: IndexMap<String, Task>) -> String {
+fn run_all_to_code() -> String {
     r#"
     for (_, task) in tasks {
         invoke(&task, &Vec::new());
-    }"#.to_string()
+    }"#
+    .to_string()
 }
 
 fn all_code(tasks: IndexMap<String, Task>, filepack: &FilePack) -> String {
@@ -128,23 +127,27 @@ use cargo_make::scriptengine::invoke;
 use indexmap::IndexMap;
 use offbin::file_packer::FilePack;
 
-fn main(){"#.to_string();
+fn main(){"#
+        .to_string();
 
     top.push_str(&filepack.to_rust());
     top.push_str(&tasks.to_rust());
-    top.push_str(&run_all_to_code(tasks));
+    top.push_str(&run_all_to_code());
 
-    top.push_str(r#"
-}"#);
+    top.push_str(
+        r#"
+}"#,
+    );
 
     top
 }
 
 pub fn generate_rust_file(path: &str, tasks: IndexMap<String, Task>, filepack: &FilePack) {
-    let code =  all_code(tasks, filepack);
+    let code = all_code(tasks, filepack);
     let mut file = File::create(path).expect("file path not valid");
     //file.write_all(filepack.to_rust().as_bytes()).expect("could not write to file");
-    file.write_all(code.as_bytes()).expect("could not write to file");    
+    file.write_all(code.as_bytes())
+        .expect("could not write to file");
 }
 
 #[cfg(test)]
@@ -160,11 +163,12 @@ mod tests {
     //     generate_rust_file("generated.rs", tasks);
     // }
 
-
     #[test]
     fn test_script() {
-        
-        let script = Some(vec!["#!/usr/bin/env".to_string(), "echo \"hellooo\"".to_string()],);
+        let script = Some(vec![
+            "#!/usr/bin/env".to_string(),
+            "echo \"hellooo\"".to_string(),
+        ]);
         println!("{:?}", script);
         println!("{}", script.to_rust());
         assert_eq!(3, 3);
@@ -182,7 +186,6 @@ mod tests {
 
     #[test]
     fn test_task() {
-        
         let task = Task {
             clear: None,
             description: None,
@@ -204,12 +207,10 @@ mod tests {
             install_script: None,
             command: None,
             args: None,
-            script: Some(
-                vec![
-                    "#!/usr/bin/env".to_string(),
-                    "echo \"Hello World\"".to_string(),
-                ]
-            ),
+            script: Some(vec![
+                "#!/usr/bin/env".to_string(),
+                "echo \"Hello World\"".to_string(),
+            ]),
             script_runner: None,
             script_extension: None,
             script_path: None,
@@ -218,17 +219,14 @@ mod tests {
             toolchain: None,
             linux: None,
             windows: None,
-            mac: None
+            mac: None,
         };
 
         println!("{}", task.to_rust());
 
         assert_eq!(3, 3);
-
-
-
     }
-    
+
     #[test]
     fn test_index_map() {
         use cargo_make::types::Task;
@@ -254,11 +252,7 @@ mod tests {
             install_script: None,
             command: None,
             args: None,
-            script: Some(
-                vec![
-                    "echo \"Hello World\"".to_string()
-                ]
-            ),
+            script: Some(vec!["echo \"Hello World\"".to_string()]),
             script_runner: None,
             script_extension: None,
             script_path: None,
@@ -267,9 +261,8 @@ mod tests {
             toolchain: None,
             linux: None,
             windows: None,
-            mac: None
+            mac: None,
         };
-    
 
         let t2 = Task {
             clear: None,
@@ -292,11 +285,7 @@ mod tests {
             install_script: None,
             command: None,
             args: None,
-            script: Some(
-                vec![
-                    "echo \"Hey\"".to_string()
-                ]
-            ),
+            script: Some(vec!["echo \"Hey\"".to_string()]),
             script_runner: None,
             script_extension: None,
             script_path: None,
@@ -305,15 +294,15 @@ mod tests {
             toolchain: None,
             linux: None,
             windows: None,
-            mac: None
+            mac: None,
         };
 
-        let mut tasks: IndexMap<String, Task> =  IndexMap::new();
+        let mut tasks: IndexMap<String, Task> = IndexMap::new();
         tasks.insert("task1".to_string(), t1);
         tasks.insert("task2".to_string(), t2);
 
         let a = tasks.to_rust();
-       
-        assert_eq!(3,3);
-    }     
+
+        assert_eq!(3, 3);
+    }
 }

@@ -2,12 +2,11 @@ extern crate structopt;
 extern crate toml;
 #[macro_use]
 extern crate serde_derive;
-extern crate rust_info;
 extern crate indexmap;
+extern crate rust_info;
 
-pub mod cli;
-pub mod config;
-pub mod custom_config;
 pub mod cargo_gen;
+pub mod cli;
 pub mod codegen;
+pub mod custom_config;
 pub mod file_packer;
