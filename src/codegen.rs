@@ -14,7 +14,7 @@ impl FormatRust<Option<Vec<String>>> for Option<Vec<String>> {
                 let mut base = 
 r#"Some(vec!["#.to_string();  
                 for line in lines {      
-                    base.push_str(&format!("\"{}\".to_string(), ", line));   
+                    base.push_str(&format!("{}, ", line.to_rust()));   
                 }
                 base.push_str("]),");
                 base
@@ -23,6 +23,25 @@ r#"Some(vec!["#.to_string();
                 "None,".to_string()
             }
         }      
+    }
+}
+
+impl FormatRust<Option<String>> for Option<String> {
+    fn to_rust(&self) -> String {
+        match self {
+            Some(line) => {
+                format!("Some({}),", line.to_rust())
+            },
+            None => {
+                "None,".to_string()
+            }
+        }
+    }
+}
+
+impl FormatRust<String> for String {
+    fn to_rust(&self) -> String {
+        format!("{:?}.to_string()", self)
     }
 }
 
@@ -52,8 +71,11 @@ impl FormatRust<Task> for Task {
         script: $a"#.to_string();
         let script = script.replace("$a", &self.script.to_rust());
 
+        let script_runner = r#"
+        script_runner: $a"#.to_string();
+        let script_runner = script_runner.replace("$a", &self.script_runner.to_rust());
+
         let bottom = r#"
-        script_runner: None, 
         script_extension: None, 
         script_path: None, 
         run_task: None, 
@@ -65,6 +87,7 @@ impl FormatRust<Task> for Task {
     }"#.to_string();
 
     top.push_str(&script);
+    top.push_str(&script_runner);
     top.push_str(&bottom);
     top
     }
@@ -88,14 +111,14 @@ impl FormatRust<IndexMap<String, Task>> for IndexMap<String, Task> {
     }
 }
 
-pub fn run_all_to_code(tasks: IndexMap<String, Task>) -> String {
+fn run_all_to_code(tasks: IndexMap<String, Task>) -> String {
     r#"
     for (_, task) in tasks {
         invoke(&task, &Vec::new());
     }"#.to_string()
 }
 
-pub fn all_code(tasks: IndexMap<String, Task>) -> String {
+fn all_code(tasks: IndexMap<String, Task>) -> String {
     let mut top = r#"
 use cargo_make::types::Task;
 use cargo_make::scriptengine::invoke;
