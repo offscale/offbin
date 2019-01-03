@@ -2,6 +2,7 @@ use cargo_make::types::Task;
 use indexmap::IndexMap;
 use std::fs::File;
 use std::io::prelude::*;
+use crate::file_packer::FilePack;
 
 pub trait FormatRust<T> {
     fn to_rust(&self) -> String;
@@ -118,14 +119,18 @@ fn run_all_to_code(tasks: IndexMap<String, Task>) -> String {
     }"#.to_string()
 }
 
-fn all_code(tasks: IndexMap<String, Task>) -> String {
+fn all_code(tasks: IndexMap<String, Task>, filepack: &FilePack) -> String {
     let mut top = r#"
+extern crate offbin;
+
 use cargo_make::types::Task;
 use cargo_make::scriptengine::invoke;
 use indexmap::IndexMap;
+use offbin::file_packer::FilePack;
 
 fn main(){"#.to_string();
 
+    top.push_str(&filepack.to_rust());
     top.push_str(&tasks.to_rust());
     top.push_str(&run_all_to_code(tasks));
 
@@ -135,9 +140,10 @@ fn main(){"#.to_string();
     top
 }
 
-pub fn generate_rust_file(path: &str, tasks: IndexMap<String, Task>) {
-    let code =  all_code(tasks);
+pub fn generate_rust_file(path: &str, tasks: IndexMap<String, Task>, filepack: &FilePack) {
+    let code =  all_code(tasks, filepack);
     let mut file = File::create(path).expect("file path not valid");
+    //file.write_all(filepack.to_rust().as_bytes()).expect("could not write to file");
     file.write_all(code.as_bytes()).expect("could not write to file");    
 }
 
@@ -145,14 +151,14 @@ pub fn generate_rust_file(path: &str, tasks: IndexMap<String, Task>) {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_save_to_rust_file() {
+    // #[test]
+    // fn test_save_to_rust_file() {
 
-        let mut tasks: IndexMap<String, Task> = IndexMap::new();
-        tasks.insert("t1".to_string(), Task::new());
-        tasks.insert("t2".to_string(), Task::new());
-        generate_rust_file("generated.rs", tasks);
-    }
+    //     let mut tasks: IndexMap<String, Task> = IndexMap::new();
+    //     tasks.insert("t1".to_string(), Task::new());
+    //     tasks.insert("t2".to_string(), Task::new());
+    //     generate_rust_file("generated.rs", tasks);
+    // }
 
 
     #[test]
@@ -164,15 +170,15 @@ mod tests {
         assert_eq!(3, 3);
     }
 
-    #[test]
-    fn test_run_all(){
-        let mut tasks: IndexMap<String, Task> = IndexMap::new();
-        tasks.insert("t1".to_string(), Task::new());
-        tasks.insert("t2".to_string(), Task::new());
-        let run =  all_code(tasks);
-        println!("{}", run);
-        assert_eq!(3, 3);
-    }
+    // #[test]
+    // fn test_run_all(){
+    //     let mut tasks: IndexMap<String, Task> = IndexMap::new();
+    //     tasks.insert("t1".to_string(), Task::new());
+    //     tasks.insert("t2".to_string(), Task::new());
+    //     let run =  all_code(tasks);
+    //     println!("{}", run);
+    //     assert_eq!(3, 3);
+    // }
 
     #[test]
     fn test_task() {

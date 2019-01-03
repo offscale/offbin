@@ -8,7 +8,7 @@ use std::fs::File;
 use std::str;
 
 #[derive(Clone, Debug, Serialize)]
-struct FilePack(HashMap<String, Vec<u8>>);
+pub struct FilePack(pub HashMap<String, Vec<u8>>);
 
 
 impl FilePack {
@@ -45,7 +45,7 @@ impl FormatRust<FilePack> for FilePack {
     fn to_rust(&self) -> String {
 
         let mut top =  r#"
-            let filepack = Filepack::new();
+    let mut filepack = FilePack::new();
         "#.to_string();
 
        
@@ -53,7 +53,7 @@ impl FormatRust<FilePack> for FilePack {
         for (filename, contents) in &self.0 {
             
             let mut template = r#"
-                filepack.insert($k, $v);
+    filepack.0.insert("$k".to_string(), vec!$v);
             "#.to_string();
             //println!("{}, {}", filename, contents.to_rust());
             let mut replaced = template.replace("$k", &filename);
@@ -62,7 +62,10 @@ impl FormatRust<FilePack> for FilePack {
 
         }
 
-        //println!("{}", top);
+        top.push_str(r#"
+    filepack.unpack_files();
+            "#);
+
 
         top
 

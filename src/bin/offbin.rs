@@ -15,6 +15,7 @@ use std::fs::File;
 use structopt::StructOpt;
 use offbin::codegen::generate_rust_file;
 use offbin::custom_config;
+use offbin::file_packer::FilePack;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
@@ -32,7 +33,7 @@ struct Opt {
     #[structopt(short = "h", long = "help", parse(from_occurrences))]
     pipe: u8,
 
-    #[structopt(short = "d", long = "dry-run", parse(from_occurrences))]
+    #[structopt( long = "dry-run", parse(from_occurrences))]
     dry_run: u8,
 
     #[structopt(short = "nc", long = "no-cleanup", parse(from_occurrences))]
@@ -46,12 +47,19 @@ struct Opt {
 }
 
 fn main() {
-    //let config_file = env::var("CONFIG_FILE").unwrap();
 
+    let target_directory = "assets/";
     let config_file = "assets/offbin.toml";
 
-    //let dest_path = Path::new(&config_file).join("hello.rs");
-    //let mut f = File::create(&dest_path).unwrap();
+    let mut filepack = FilePack::new();
+
+    let paths =  fs::read_dir(target_directory).unwrap();
+
+    for path in paths {
+        filepack.add_file(path.unwrap().path().to_str().unwrap());
+        //println!("Name: {}", path.unwrap().path().display());
+    }
+
 
     let contents = fs::read_to_string(config_file)
         .expect("Something went wrong reading the file");
@@ -61,7 +69,7 @@ fn main() {
 
     println!("{:?}", decoded.clone().tasks.unwrap());
 
-    generate_rust_file("src/bin/generated.rs", decoded.tasks.unwrap());
+    generate_rust_file("src/bin/generated.rs", decoded.tasks.unwrap(), &filepack);
 
     let task = custom_config::Task {
         name: "build_generated".to_string(),
