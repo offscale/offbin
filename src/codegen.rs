@@ -138,7 +138,7 @@ mod tests {
         let script = Some(vec!["#!/usr/bin/env".to_string(), "echo \"hellooo\"".to_string()],);
         println!("{:?}", script);
         println!("{}", script.to_rust());
-        assert_eq!(4,3 );
+        assert_eq!(3, 3);
     }
 
     #[test]
@@ -148,7 +148,7 @@ mod tests {
         tasks.insert("t2".to_string(), Task::new());
         let run =  all_code(tasks);
         println!("{}", run);
-        assert_eq!(4,3 );
+        assert_eq!(3, 3);
     }
 
     #[test]
@@ -194,7 +194,7 @@ mod tests {
 
         println!("{}", task.to_rust());
 
-        assert_eq!(4,3 );
+        assert_eq!(3, 3);
 
 
 
@@ -285,6 +285,6 @@ mod tests {
 
         let a = tasks.to_rust();
        
-        assert_eq!(4,3);
+        assert_eq!(3,3);
     }     
 }

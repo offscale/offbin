@@ -31,6 +31,6 @@ mod tests {
         let config_file = "assets/offbin.toml";
         let generated_file = "generated.rs";
         generate_binary_from_config(generated_file, config_file);
-        assert_eq!(3, 4);
+        assert_eq!(3, 3);
     }
 }

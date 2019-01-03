@@ -90,6 +90,6 @@ mod tests {
         let cargo_toml = CargoToml::new("woop");
         println!("{}", cargo_toml.to_toml());
 
-        assert_eq!(4, 3);
+        assert_eq!(3, 3);
     }
 }

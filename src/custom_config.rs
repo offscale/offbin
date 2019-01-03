@@ -73,17 +73,17 @@ mod tests {
     }
 
 
-//    #[test]
-//    fn test_load_from_file() {
-//
-//        let mut path = String::new();
-//        path.push_str(env!("CARGO_MANIFEST_DIR"));
-//        path.push_str("/assets/offbin.toml");
-//
-//        let decoded = Config::load_from_file(&path);
-//        println!("{:#?}", decoded);
-//        assert_eq!(2, decoded.tools.unwrap().len());
-//    }
+   #[test]
+   fn test_load_from_file() {
+
+       let mut path = String::new();
+       path.push_str(env!("CARGO_MANIFEST_DIR"));
+       path.push_str("/assets/offbin.toml");
+
+       let decoded = Config::load_from_file(&path);
+       println!("{:#?}", decoded);
+       assert_eq!(2, decoded.tasks.unwrap().len());
+   }
 
     #[test]
     fn test_execute_task() {

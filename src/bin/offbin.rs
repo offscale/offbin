@@ -12,111 +12,66 @@ use indexmap::IndexMap;
 use std::error::Error;
 use std::io::prelude::*;
 use std::fs::File;
+use structopt::StructOpt;
+use offbin::codegen::generate_rust_file;
+use offbin::custom_config;
 
-
-
-fn main() {
-    // //let config_file = env::var("CONFIG_FILE").unwrap();
-
-    // let config_file = "assets/offbin.toml";
-
-    // //let dest_path = Path::new(&config_file).join("hello.rs");
-    // //let mut f = File::create(&dest_path).unwrap();
-
-    // let contents = fs::read_to_string(config_file)
-    //     .expect("Something went wrong reading the file");
-
+#[derive(StructOpt, Debug)]
+#[structopt(name = "basic")]
+struct Opt {
    
-    // let decoded: ExternalConfig = toml::from_str(&contents).unwrap();
+    #[structopt(short = "d", long = "debug")]
+    debug: bool,
+   
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    version: u8,
 
-    // println!("{:?}", decoded.clone().tasks.unwrap());
-    // let mut a = imports_to_code();
-    // a.push_str(&format!("let a = {:?}", decoded));
-    // //let mut a = format!("let a = {:?}", decoded);
+    #[structopt(short = "h", long = "help", parse(from_occurrences))]
+    help: u8,
 
-    // let a = main_to_code(a);
-    // println!("{:?}", a);
+    #[structopt(short = "h", long = "help", parse(from_occurrences))]
+    pipe: u8,
 
-    // let path = Path::new("generated.rs");
-    // let display = path.display();
+    #[structopt(short = "d", long = "dry-run", parse(from_occurrences))]
+    dry_run: u8,
 
-    // // Open a file in write-only mode, returns `io::Result<File>`
-    // let mut file = match File::create(&path) {
-    //     Err(why) => panic!("couldn't create {}: {}",
-    //                        display,
-    //                        why.description()),
-    //     Ok(file) => file,
-    // };
+    #[structopt(short = "nc", long = "no-cleanup", parse(from_occurrences))]
+    no_cleanup: u8,
 
-    // // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
-    // match file.write_all(a.as_bytes()) {
-    //     Err(why) => {
-    //         panic!("couldn't write to {}: {}", display,
-    //                                            why.description())
-    //     },
-    //     Ok(_) => println!("successfully wrote to {}", display),
-    // }
-
-    // {
-    //     let task = decoded.tasks.unwrap().get("hello-world-common").unwrap().clone();
-    //     invoke(&task, &vec![]);
-    // }
-
-    // {
-    //     decoded.tasks.unwrap().iter().for_each(|(name, task)|{
-    //         println!("{:?}", name);
-    //           println!("{:?}", task);
-    //     });
-    // }
-
-
+    #[structopt(short = "o", long = "output", parse(from_occurrences))]
+    output: u8,
     
-
-    //ExternalConfig::
-//    f.write_all(b"
-//    pub fn message() -> &'static str {
-//        \"Hello, World!\"
-//    }
-//    ").unwrap();
+    #[structopt(short = "e", long = "entrypoint")]
+    entrypoint: String,
 }
 
+fn main() {
+    //let config_file = env::var("CONFIG_FILE").unwrap();
 
-// fn task_to_rust_code(task: &Task) -> String {
+    let config_file = "assets/offbin.toml";
+
+    //let dest_path = Path::new(&config_file).join("hello.rs");
+    //let mut f = File::create(&dest_path).unwrap();
+
+    let contents = fs::read_to_string(config_file)
+        .expect("Something went wrong reading the file");
+
+   
+    let decoded: ExternalConfig = toml::from_str(&contents).unwrap();
+
+    println!("{:?}", decoded.clone().tasks.unwrap());
+
+    generate_rust_file("src/bin/generated.rs", decoded.tasks.unwrap());
+
+    let task = custom_config::Task {
+        name: "build_generated".to_string(),
+        command: "cargo".to_string(),
+        args: vec!["build".to_string()],
+    };
+
+    let output = task.execute();
+
     
-//     let code  = r#"
-//         let tasks = vec![Task {
-//             clear: None,
-//             description: None,
-//             category: None,
-//             disabled: None,
-//             private: None,
-//             workspace: None,
-//             condition: None,
-//             condition_script: None,
-//             force: None,
-//             env: None,
-//             cwd: None,
-//             alias: None,
-//             linux_alias: None,
-//             windows_alias: None,
-//             mac_alias: None,
-//             install_crate: None,
-//             install_crate_args: None,
-//             install_script: None,
-//             command: None,
-//             args: None,
-//             script: None,
-//             script_runner: ${ewfwef},
-//             script_extension: ${wfwefwf},
-//             script_path: ${wef},
-//             run_task: None,
-//             dependencies: None,
-//             toolchain: None,
-//             linux: None,
-//             windows: None,
-//             mac: None,
-//         }]
-//     "
-    
- 
-// }
+   
+
+}

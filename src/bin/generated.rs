@@ -81,7 +81,7 @@ fn main(){
         install_crate_args: None, 
         install_script: None, 
         command: None, args: None,
-        script: Some(vec!["echo \"Hello World From Unknown\"".to_string(), ]),
+        script: Some(vec!["echo 'Hello World From Unknown'".to_string(), ]),
         script_runner: None, 
         script_extension: None, 
         script_path: None, 
