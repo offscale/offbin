@@ -39,9 +39,47 @@ impl FormatRust<String> for String {
     }
 }
 
+
+pub fn task_from_filename(filename: &str) -> Task {
+        println!("{}", filename);
+        match filename {
+        "Cargo.toml" => {
+            let mut task = Task::new();
+            task.command = Some("cargo".to_string());
+            task.args = Some(vec!["build".to_string()]);
+            task
+        },
+        "Rakefile" => {
+        
+            let mut task = Task::new();
+            task.command = Some("rake".to_string());
+            task.args = Some(vec!["".to_string()]);
+            //println!("{:?}", task);
+            task
+                
+        },
+        "Makefile" => {
+            let mut task = Task::new();
+            task.command = Some("make".to_string());
+            task.args = Some(vec!["".to_string()]);
+            task
+        },
+        "package.json" => {
+            let mut task = Task::new();
+            task.command = Some("npm".to_string());
+            task.args = Some(vec!["start".to_string()]);
+            task
+        },
+        _ => {
+            Task::new()
+        },
+    }
+}
+
+
 impl FormatRust<Task> for Task {
     fn to_rust(&self) -> String {
-        let mut top = r#"Task { 
+        let top = r#"Task { 
         clear: None,
         description: None,
         category: None,
@@ -50,16 +88,22 @@ impl FormatRust<Task> for Task {
         workspace: None,
         condition: None,
         condition_script: None,
-        force: None, env: None,
-        cwd: None, alias: None, 
+        force: None,
+        env: None,
+        cwd: None,
+        alias: None, 
         linux_alias: None, 
         windows_alias: None, 
         mac_alias: None, 
         install_crate: None, 
         install_crate_args: None, 
         install_script: None, 
-        command: None, args: None,"#
+        command: $command
+        args: $args"#
             .to_string();
+        
+        let top = top.replace("$command", &self.command.to_rust());
+        let mut top = top.replace("$args", &self.args.to_rust());
 
         let script = r#"
         script: $a"#

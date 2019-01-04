@@ -8,6 +8,7 @@ use structopt::StructOpt;
 //use offbin::custom_config;
 use offbin::cargo_gen::CargoToml;
 use offbin::file_packer::FilePack;
+use offbin::codegen::task_from_filename;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
@@ -40,34 +41,50 @@ struct Opt {
 fn main() {
     let target_directory = "assets/";
     let config_file = "assets/offbin.toml";
-    //let generated = "gen/";
     let generated_bin = "fantom_installer/src";
+
+    let contents = fs::read_to_string(config_file).expect("Something went wrong reading the file");
+
+    let decoded: ExternalConfig = toml::from_str(&contents).unwrap();
+
+    let mut tasks = decoded.tasks.unwrap();
+
+    //println!("{:?}", decoded.clone().tasks.unwrap());
 
     let mut filepack = FilePack::new();
 
     let paths = fs::read_dir(target_directory).unwrap();
 
     for path in paths {
-        filepack.add_file(path.unwrap().path().to_str().unwrap());
+
+        let filepath = path.unwrap().path();
+        
+        {
+            let clone = filepath.clone();
+            filepack.add_file(clone.to_str().unwrap());
+        }
+
+        //println!("Name: {}", path.unwrap().path().display());
+        let filename = filepath.file_name().unwrap().to_str().unwrap();
+        println!("Name: {}", filename.clone());
+        let task = task_from_filename(filename);
+
+
+        tasks.insert(filename.to_string(), task);
+
         //println!("Name: {}", path.unwrap().path().display());
     }
-
-    let contents = fs::read_to_string(config_file).expect("Something went wrong reading the file");
-
-    let decoded: ExternalConfig = toml::from_str(&contents).unwrap();
-
-    println!("{:?}", decoded.clone().tasks.unwrap());
 
     DirBuilder::new()
         .recursive(true)
         .create(generated_bin)
         .unwrap();
 
-    CargoToml::new("fantom_installer").to_file("fantom_installer/cargo.toml".to_string());
+    CargoToml::new("fantom_installer").to_file("fantom_installer/Cargo.toml".to_string());
 
     generate_rust_file(
         "fantom_installer/src/main.rs",
-        decoded.tasks.unwrap(),
+        tasks,
         &filepack,
     );
 

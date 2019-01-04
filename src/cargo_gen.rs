@@ -5,7 +5,7 @@ use std::io::Write;
 pub struct CargoToml {
     package: Package,
     dependencies: Dependencies,
-    bin: Vec<Bin>,
+    //bin: Vec<Bin>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -20,7 +20,10 @@ struct Dependencies {
     toml: String,
     serde_derive: String,
     serde: String,
+    indexmap: String,
     offbin: Offbin,
+    #[serde(rename = "cargo-make")]
+    cargo_make: CargoMake,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -29,17 +32,23 @@ struct Offbin {
 }
 
 #[derive(Clone, Debug, Serialize)]
-struct Bin {
-    name: String,
+struct CargoMake {
+    git: String,
+    branch: String,
 }
 
-impl Bin {
-    fn new(name: &str) -> Self {
-        Bin {
-            name: name.to_string(),
-        }
-    }
-}
+// #[derive(Clone, Debug, Serialize)]
+// struct Bin {
+//     name: String,
+// }
+
+// impl Bin {
+//     fn new(name: &str) -> Self {
+//         Bin {
+//             name: name.to_string(),
+//         }
+//     }
+// }
 
 impl Dependencies {
     fn new() -> Self {
@@ -47,9 +56,14 @@ impl Dependencies {
             toml: "0.2".to_string(),
             serde_derive: "1.0".to_string(),
             serde: "1.0".to_string(),
+            indexmap: "1.0.2".to_string(),
             offbin: Offbin {
-                    git: "https://github.com/offscale/offbin.git".to_string()
-                },
+                git: "https://github.com/offscale/offbin.git".to_string(),
+            },
+            cargo_make: CargoMake {
+                git: "https://github.com/offscale/cargo-make.git".to_string(),
+                branch: "offbin".to_string(),
+            },
         }
     }
 }
@@ -73,7 +87,7 @@ impl CargoToml {
         CargoToml {
             package: package,
             dependencies: dependencies,
-            bin: vec![Bin::new(name)],
+            //bin: vec![Bin::new(name)],
         }
     }
 

@@ -1,1 +1,1 @@
-hello: ; @echo "Hello from Make!"
+hello: ; @touch "created-by-make.txt"

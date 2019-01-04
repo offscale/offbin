@@ -2,23 +2,18 @@
 skip_core_tasks = true
 
 [tasks.default]
-dependencies = ["hello-world-common", "hello-world"]
+dependencies = ["task-a", "task-b"]
 
-[tasks.hello-world-common]
+[tasks.task-a]
 script_runner = "@shell"
 script = [
-    "touch 'testfile.txt'"
+    "touch 'file-a.txt'"
 ]
 
-[tasks.hello-world]
+[tasks.task-b]
 script_runner = "@shell"
 script = [
-    "echo 'Hello World From Unknown'"
+    "touch 'file-b.txt'"
 ]
 
-[tasks.hello-world.linux]
-script_runner = "@shell"
-script = [
-    "echo 'Hello World From Linux'"
-]
 

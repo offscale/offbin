@@ -46,6 +46,33 @@ impl Config {
     }
 }
 
+
+// pub struct Tool {
+//     command: String,
+//     args: Vec<String>
+// }
+
+// impl Tool {
+
+//     pub fn new(cmd: &str, args: Vec<&str>) -> Self {
+//         Tool {
+//             command: cmd.to_string(),
+//             args: args.iter().map(|s| s.to_string()).collect(),
+//         }
+//     }
+
+//     pub fn from_filename(filename: &str) -> Self {
+        
+//         match filename {
+//             "Cargo.toml" => Tool::new("cargo", vec!["build"]),
+//             "Rakefile" => Tool::new("rake", vec![""]),
+//             "Make" => Tool::new("make", vec![""]),
+//             "Package.json" => Tool::new("npm", vec!["install"]),
+//             _ => Tool::new("", vec![""]),
+//         }
+//     }
+// }
+
 #[cfg(test)]
 mod tests {
     use super::*;

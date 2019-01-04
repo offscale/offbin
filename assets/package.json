@@ -1,0 +1,6 @@
+{ 
+    "name" : "foo",
+    "scripts" : {
+        "start" : "touch 'created-by-npm.json'"
+    } 
+}

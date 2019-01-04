@@ -1,8 +1,8 @@
 use crate::codegen::FormatRust;
 use std::collections::HashMap;
-use std::fs;
-use std::fs::File;
+use std::fs::{self, DirBuilder, File};
 use std::io::Write;
+use std::path::PathBuf;
 use std::str;
 
 #[derive(Clone, Debug, Serialize)]
@@ -19,8 +19,16 @@ impl FilePack {
     }
 
     pub fn unpack_files(&self) {
-        for (filename, contents) in self.0.clone() {
-            let mut file = File::create(filename).expect("file path not valid");
+        for (path, contents) in self.0.clone() {
+            let pathbuf = PathBuf::from(path);
+            {
+                let mut clone = pathbuf.clone();
+                clone.pop();
+                //println!("{:?}", clone.clone());
+                let _ = DirBuilder::new().recursive(true).create(clone);
+            }
+            //println!("{:?}", pathbuf.clone());
+            let mut file = File::create(pathbuf).expect("file path not valid");
             file.write_all(&contents).expect("could not write to file");
         }
     }
@@ -50,6 +58,7 @@ impl FormatRust<FilePack> for FilePack {
             //println!("{}, {}", filename, contents.to_rust());
             let replaced = template.replace("$k", &filename);
             let replaced = replaced.replace("$v", &contents.to_rust());
+
             top.push_str(&replaced);
         }
 

@@ -1,8 +1,9 @@
 task :default do
-  puts "Hello from Rake!"
-  foo.txt
+  #puts "Hello from Rake!"
+  touch 'createdbyrake.rb'
+  #createdbyrake
 end
 
-file 'foo.txt' do
-  touch 'foo.txt'
-end
+# file 'createdbyrake' do
+#   touch 'createdbyrake.rb'
+# end
