@@ -21,34 +21,34 @@ struct Dependencies {
     serde_derive: String,
     serde: String,
     indexmap: String,
+    structopt: String,
+    rust_info: String,
     offbin: Offbin,
     #[serde(rename = "cargo-make")]
     cargo_make: CargoMake,
 }
 
+//#[derive(Clone, Debug, Serialize)]
+//struct Offbin {
+//    git: String,
+//}
+//
+//#[derive(Clone, Debug, Serialize)]
+//struct CargoMake {
+//    git: String,
+//    branch: String,
+//}
+
 #[derive(Clone, Debug, Serialize)]
 struct Offbin {
-    git: String,
+    path: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
 struct CargoMake {
-    git: String,
-    branch: String,
+    path: String,
 }
 
-// #[derive(Clone, Debug, Serialize)]
-// struct Bin {
-//     name: String,
-// }
-
-// impl Bin {
-//     fn new(name: &str) -> Self {
-//         Bin {
-//             name: name.to_string(),
-//         }
-//     }
-// }
 
 impl Dependencies {
     fn new() -> Self {
@@ -57,12 +57,20 @@ impl Dependencies {
             serde_derive: "1.0".to_string(),
             serde: "1.0".to_string(),
             indexmap: "1.0.2".to_string(),
+            structopt: "0.2".to_string(),
+            rust_info: "0.2.1".to_string(),
+//            offbin: Offbin {
+//                git: "https://github.com/offscale/offbin.git".to_string(),
+//            },
+//            cargo_make: CargoMake {
+//                git: "https://github.com/offscale/cargo-make.git".to_string(),
+//                branch: "offbin".to_string(),
+//            },
             offbin: Offbin {
-                git: "https://github.com/offscale/offbin.git".to_string(),
+                path: "/Users/rishflab/offbin".to_string(),
             },
             cargo_make: CargoMake {
-                git: "https://github.com/offscale/cargo-make.git".to_string(),
-                branch: "offbin".to_string(),
+                path: "/Users/rishflab/cargo-make".to_string(),
             },
         }
     }

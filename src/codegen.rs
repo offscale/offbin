@@ -3,6 +3,7 @@ use cargo_make::types::Task;
 use indexmap::IndexMap;
 use std::fs::File;
 use std::io::prelude::*;
+use std::path::{PathBuf};
 
 pub trait FormatRust<T> {
     fn to_rust(&self) -> String;
@@ -40,46 +41,52 @@ impl FormatRust<String> for String {
 }
 
 
-pub fn task_from_filename(filename: &str) -> Task {
+pub fn task_from_filename(filename: &str, path: PathBuf) -> Task {
         println!("{}", filename);
+        let mut task = Task::new();
         match filename {
         "Cargo.toml" => {
-            let mut task = Task::new();
+
             task.command = Some("cargo".to_string());
             task.args = Some(vec!["build".to_string()]);
+            task.cwd = Some(path.to_str().unwrap().to_string());
+            //task.alias
             task
         },
         "Rakefile" => {
         
-            let mut task = Task::new();
             task.command = Some("rake".to_string());
-            task.args = Some(vec!["".to_string()]);
+            task.cwd = Some(path.to_str().unwrap().to_string());
             //println!("{:?}", task);
             task
-                
+
         },
         "Makefile" => {
-            let mut task = Task::new();
             task.command = Some("make".to_string());
-            task.args = Some(vec!["".to_string()]);
+            task.cwd = Some(path.to_str().unwrap().to_string());
             task
         },
         "package.json" => {
-            let mut task = Task::new();
             task.command = Some("npm".to_string());
             task.args = Some(vec!["start".to_string()]);
+            task.cwd = Some(path.to_str().unwrap().to_string());
             task
         },
         _ => {
-            Task::new()
+            task
         },
     }
 }
 
-
-impl FormatRust<Task> for Task {
+impl FormatRust<IndexMap<String, Task>> for IndexMap<String, Task> {
     fn to_rust(&self) -> String {
-        let top = r#"Task { 
+        let mut tasks = r#"
+    let mut tasks: IndexMap<String, (FlowInfo, Step)> = IndexMap::new();"#
+            .to_string();
+
+        for (name, task) in self {
+            let task =   r#"
+    let task = Task {
         clear: None,
         description: None,
         category: None,
@@ -90,74 +97,68 @@ impl FormatRust<Task> for Task {
         condition_script: None,
         force: None,
         env: None,
-        cwd: None,
-        alias: None, 
-        linux_alias: None, 
-        windows_alias: None, 
-        mac_alias: None, 
-        install_crate: None, 
-        install_crate_args: None, 
-        install_script: None, 
+        cwd: $cwd
+        alias: None,
+        linux_alias: None,
+        windows_alias: None,
+        mac_alias: None,
+        install_crate: None,
+        install_crate_args: None,
+        install_script: None,
         command: $command
-        args: $args"#
-            .to_string();
-        
-        let top = top.replace("$command", &self.command.to_rust());
-        let mut top = top.replace("$args", &self.args.to_rust());
-
-        let script = r#"
-        script: $a"#
-            .to_string();
-        let script = script.replace("$a", &self.script.to_rust());
-
-        let script_runner = r#"
-        script_runner: $a"#
-            .to_string();
-        let script_runner = script_runner.replace("$a", &self.script_runner.to_rust());
-
-        let bottom = r#"
-        script_extension: None, 
-        script_path: None, 
-        run_task: None, 
-        dependencies: None, 
-        toolchain: None, 
-        linux: None, 
-        windows: None, 
+        args: $args
+        script: $script
+        script_runner: $script_runner
+        script_extension: None,
+        script_path: None,
+        run_task: None,
+        dependencies: None,
+        toolchain: None,
+        linux: None,
+        windows: None,
         mac: None
-    }"#
-        .to_string();
+    };
+    let step = Step {
+        name: "$name".to_string(),
+        config: task,
+    };
+    let flow_info = FlowInfo {
+        config: config.clone(),
+        task: "$name".to_string(),
+        env_info: EnvInfo {
+            rust_info: RustInfo::new(),
+            crate_info: CrateInfo::new(),
+            git_info: GitInfo::new(),
+        },
+        disable_workspace: false,
+        disable_on_error: false,
+        cli_arguments: None,
+    };
+    tasks.insert("$name".to_string(), (flow_info, step));
 
-        top.push_str(&script);
-        top.push_str(&script_runner);
-        top.push_str(&bottom);
-        top
-    }
-}
+            "#.to_string()
+                .replace("$command", &task.command.to_rust())
+                .replace("$args", &task.args.to_rust())
+                .replace("$script_runner", &task.script_runner.to_rust())
+                .replace("$script", &task.script.to_rust())
+                .replace("$cwd", &task.cwd.to_rust())
+                //.replace("$env", &task.env.to_rust())
+                .replace("$name", &name);
 
-impl FormatRust<IndexMap<String, Task>> for IndexMap<String, Task> {
-    fn to_rust(&self) -> String {
-        let mut task_str = r#"
-    let mut tasks: IndexMap<String, Task> = IndexMap::new();"#
-            .to_string();
-
-        let template = r#"
-    tasks.insert("$k".to_string(), $v);"#
-            .to_string();
-        for (name, task) in self {
-            println!("{:?}, {:?}", name, task);
-            let replaced = template.replace("$k", &name);
-            let replaced = replaced.replace("$v", &task.to_rust());
-            task_str.push_str(&replaced);
+            tasks.push_str(&task);
         }
-        println!("{}", task_str);
-        task_str
+        //println!("{}", init_map);
+        tasks
     }
 }
 
 fn run_all_to_code() -> String {
     r#"
-    for (_, task) in tasks {
-        invoke(&task, &Vec::new());
+    let opt =  Opt::from_args();
+    for task_name in opt.entrypoint {
+        let (task, step) = &tasks[&task_name];
+        //println!("{:?}", task_name);
+        run_task(&task, &step);
     }"#
     .to_string()
 }
@@ -165,13 +166,49 @@ fn run_all_to_code() -> String {
 fn all_code(tasks: IndexMap<String, Task>, filepack: &FilePack) -> String {
     let mut top = r#"
 extern crate offbin;
+extern crate structopt;
+extern crate rust_info;
 
-use cargo_make::types::Task;
-use cargo_make::scriptengine::invoke;
+use cargo_make::types::{Step, FlowInfo, Task, Config, ConfigSection, EnvInfo, GitInfo, CrateInfo};
+use cargo_make::runner::run_task;
 use indexmap::IndexMap;
 use offbin::file_packer::FilePack;
+use structopt::StructOpt;
+use rust_info::types::RustInfo;
 
-fn main(){"#
+#[derive(StructOpt, Debug)]
+#[structopt(name = "fantom_installer")]
+struct Opt {
+    #[structopt(short = "d", long = "debug")]
+    debug: bool,
+
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    version: u8,
+
+    #[structopt(short = "h", long = "help", parse(from_occurrences))]
+    help: u8,
+
+    #[structopt(long = "dry-run", parse(from_occurrences))]
+    dry_run: u8,
+
+    #[structopt(short = "nc", long = "no-cleanup", parse(from_occurrences))]
+    no_cleanup: u8,
+
+    #[structopt(short = "o", long = "output", parse(from_occurrences))]
+    output: u8,
+
+    #[structopt(short = "e", long = "entrypoint")]
+    entrypoint: Vec<String>,
+}
+
+fn main(){
+
+    let config = Config {
+        config: ConfigSection::new(),
+        env: IndexMap::new(),
+        tasks: IndexMap::new(),
+    };
+"#
         .to_string();
 
     top.push_str(&filepack.to_rust());

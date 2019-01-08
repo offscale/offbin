@@ -47,9 +47,9 @@ fn main() {
 
     let decoded: ExternalConfig = toml::from_str(&contents).unwrap();
 
-    let mut tasks = decoded.tasks.unwrap();
+    let mut tasks = decoded.clone().tasks.unwrap();
 
-    //println!("{:?}", decoded.clone().tasks.unwrap());
+    println!("{:?}", decoded.clone().tasks.unwrap());
 
     let mut filepack = FilePack::new();
 
@@ -57,7 +57,7 @@ fn main() {
 
     for path in paths {
 
-        let filepath = path.unwrap().path();
+        let mut filepath = path.unwrap().path();
         
         {
             let clone = filepath.clone();
@@ -65,9 +65,10 @@ fn main() {
         }
 
         //println!("Name: {}", path.unwrap().path().display());
-        let filename = filepath.file_name().unwrap().to_str().unwrap();
-        println!("Name: {}", filename.clone());
-        let task = task_from_filename(filename);
+        let filename = filepath.file_name().unwrap().to_str().unwrap().to_string();
+        //println!("Name: {}", filename.clone());
+        filepath.pop();
+        let task = task_from_filename(&filename, filepath.clone());
 
 
         tasks.insert(filename.to_string(), task);
