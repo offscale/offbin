@@ -2,9 +2,23 @@ offbin
 ======
 Single command to run any of the commands that were previously in the directory.
 
+
+
 ## RFC
 
 https://github.com/offscale/offscale-rfcs/blob/master/%5Boffbin%5D%20Binarise%20tool.md
+
+
+## User guide
+
+Note: Offbin in currently in development and not recommended for production use.
+
+Running offbin will generate a new rust project and build a self-extracting binary located
+in s  
+```bash
+$ offbin -i input_folder -o output_folder
+```
+
 
 ## Developer guide
 

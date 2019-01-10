@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Write;
+use std::path::PathBuf;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct CargoToml {
@@ -103,7 +104,7 @@ impl CargoToml {
         toml::to_string(&self).unwrap()
     }
 
-    pub fn to_file(&self, filename: String) {
+    pub fn to_file(&self, filename: PathBuf) {
         let mut file = File::create(filename).expect("file path not valid");
         file.write_all(self.to_toml().as_bytes())
             .expect("could not write to file");

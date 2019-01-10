@@ -42,34 +42,34 @@ impl FormatRust<String> for String {
 
 
 pub fn task_from_filename(filename: &str, path: PathBuf) -> Task {
-        println!("{}", filename);
+        //println!("{}", filename);
         let mut task = Task::new();
         match filename {
         "Cargo.toml" => {
 
             task.command = Some("cargo".to_string());
             task.args = Some(vec!["build".to_string()]);
-            task.cwd = Some(path.to_str().unwrap().to_string());
+            task.cwd = Some(path.to_string_lossy().into_owned());
             //task.alias
             task
         },
         "Rakefile" => {
         
             task.command = Some("rake".to_string());
-            task.cwd = Some(path.to_str().unwrap().to_string());
+            task.cwd = Some(path.to_string_lossy().into_owned());
             //println!("{:?}", task);
             task
 
         },
         "Makefile" => {
             task.command = Some("make".to_string());
-            task.cwd = Some(path.to_str().unwrap().to_string());
+            task.cwd = Some(path.to_string_lossy().into_owned());
             task
         },
         "package.json" => {
             task.command = Some("npm".to_string());
             task.args = Some(vec!["start".to_string()]);
-            task.cwd = Some(path.to_str().unwrap().to_string());
+            task.cwd = Some(path.to_string_lossy().into_owned());
             task
         },
         _ => {
@@ -223,9 +223,9 @@ fn main(){
     top
 }
 
-pub fn generate_rust_file(path: &str, tasks: IndexMap<String, Task>, filepack: &FilePack) {
+pub fn generate_rust_file(path: PathBuf, tasks: IndexMap<String, Task>, filepack: &FilePack) {
     let code = all_code(tasks, filepack);
-    let mut file = File::create(path).expect("file path not valid");
+    let mut file = File::create(path.clone()).expect(&format!("file path: {} not valid", path.display()));
     //file.write_all(filepack.to_rust().as_bytes()).expect("could not write to file");
     file.write_all(code.as_bytes())
         .expect("could not write to file");
@@ -248,7 +248,7 @@ mod tests {
     fn test_script() {
         let script = Some(vec![
             "#!/usr/bin/env".to_string(),
-            "echo \"hellooo\"".to_string(),
+            "echo \"helloooo\"".to_string(),
         ]);
         println!("{:?}", script);
         println!("{}", script.to_rust());
