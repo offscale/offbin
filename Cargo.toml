@@ -13,4 +13,4 @@ indexmap = "1.0.2"
 rust_info = "0.2.1"
 walkdir = "2.2.7"
 #cargo-make = { git = "https://github.com/offscale/cargo-make.git", branch = "offbin" }
-cargo-make = { path = "/Users/rishflab/cargo-make"}
+cargo-make = { git = "https://github.com/offscale/cargo-make", branch = "shebang-runner" }
